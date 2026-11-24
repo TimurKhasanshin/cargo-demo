@@ -241,15 +241,15 @@ input[type=radio],input[type=checkbox]{accent-color:var(--p);width:22px;height:2
 <section class="screen" id="route">
   <header class="top"><div class="row1"><button class="back" data-go="cargo" aria-label="Назад"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div><div class="step">Шаг 3 из 5</div><div class="title">Маршрут и участники</div></div></div><div class="prog"><b style="width:60%"></b></div></header>
   <main>
-    <div><label class="lbl" for="fSnd">Грузоотправитель</label><input class="in" id="fSnd" value="ООО «Альфа Электро»"><div class="hint">Тот, кто передаёт вам груз</div></div>
-    <div><label class="lbl" for="fRcv">Грузополучатель</label><input class="in" id="fRcv" value="ООО «ТехноМаркет Казань»"></div>
+    <div><label class="lbl" for="fSnd">Грузоотправитель</label><input class="in" id="fSnd" list="cpList" value="ООО «Альфа Электро»" onchange="cpPicked('fSnd','fFrom')"><div class="hint">Тот, кто передаёт вам груз. Выберите из справочника или введите</div></div>
+    <div><label class="lbl" for="fRcv">Грузополучатель</label><input class="in" id="fRcv" list="cpList" value="ООО «ТехноМаркет Казань»" onchange="cpPicked('fRcv','fTo')"></div>
     <div><label class="lbl" for="fFrom">Пункт отправления</label><input class="in" id="fFrom" value="Москва, ул. Складская, 12"></div>
     <div><label class="lbl" for="fTo">Пункт назначения</label><input class="in" id="fTo" value="Казань, пр. Победы, 141"></div>
     <div class="grid2">
       <div><label class="lbl" for="fD1">Отправление</label><input class="in" id="fD1" type="date"></div>
       <div><label class="lbl" for="fD2">Прибытие</label><input class="in" id="fD2" type="date"></div>
     </div>
-    <div><label class="lbl" for="fFwd">Экспедитор / перевозчик</label><input class="in" id="fFwd" value="ООО «ТрансЛогистик»"><div class="hint">По умолчанию ваша компания. Измените, если везёт субподрядчик.</div></div>
+    <div><label class="lbl" for="fFwd">Экспедитор / перевозчик</label><input class="in" id="fFwd" list="cpList" value="ООО «ТрансЛогистик»"><div class="hint">По умолчанию ваша компания. Измените, если везёт субподрядчик.</div></div>
     <div><label class="lbl" for="fCnt">Номер контейнера <span class="mut" style="font-weight:400">(необязательно)</span></label><input class="in" id="fCnt" placeholder="Если груз в контейнере"></div>
   </main>
   <div class="foot"><button class="btn2" data-go="cargo">Назад</button><button class="btn" onclick="routeNext()">Далее</button></div>
@@ -364,6 +364,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--p);width:22px;height:2
 <div class="overlay" id="ov"><div class="loader"><div class="spin" aria-hidden="true"></div><div class="b" id="ovText"></div><div class="small mut" id="ovSub"></div></div></div>
 <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="body" role="dialog" aria-modal="true"><div class="grab"></div><div class="h2" id="shTitle" style="margin-bottom:6px"></div><div id="shBody"></div></div></div>
 <div class="toast" id="toast" role="status"></div>
+<datalist id="cpList"></datalist>
 
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -382,7 +383,12 @@ $$('.tabs').forEach(n=>{n.setAttribute('aria-label','Основное меню')
 /* ---------- данные ---------- */
 const VEH=[{id:1,num:'А123ВС 777',brand:'Volvo FH',trl:'ВТ4567 77'},{id:2,num:'М456ОР 199',brand:'КАМАЗ 54901',trl:'АК1203 50'},{id:3,num:'Е789КХ 750',brand:'Scania R450',trl:''}];
 const DRV=[{id:1,fio:'Петров Сергей Иванович',ini:'ПС',ok:true},{id:2,fio:'Козлов Андрей Викторович',ini:'КА',ok:true},{id:3,fio:'Никитин Дмитрий Олегович',ini:'НД',ok:false,miss:'кем выдан паспорт'}];
-const CP=[{n:'ООО «Альфа Электро»',r:'Грузоотправитель · Москва'},{n:'ООО «ТехноМаркет Казань»',r:'Грузополучатель · Казань'},{n:'ООО «СтройДвор»',r:'Грузоотправитель · Санкт-Петербург'},{n:'ООО «Мегастрой»',r:'Грузополучатель · Москва'}];
+const CP=[
+  {n:'ООО «Альфа Электро»',inn:'7701234567',kpp:'770101001',roles:['snd'],addr:'Москва, ул. Складская, 12',email:'info@alfa-electro.ru'},
+  {n:'ООО «ТехноМаркет Казань»',inn:'1655123456',kpp:'165501001',roles:['rcv'],addr:'Казань, пр. Победы, 141',email:''},
+  {n:'ООО «СтройДвор»',inn:'7802345678',kpp:'780201001',roles:['snd'],addr:'Санкт-Петербург, Промышленная ул., 5',email:'logistics@stroydvor.ru'},
+  {n:'ООО «Мегастрой»',inn:'7703456789',kpp:'770301001',roles:['rcv'],addr:'Москва, Шоссейная ул., 30',email:''}];
+const ROLE={snd:'Грузоотправитель',rcv:'Грузополучатель',fwd:'Перевозчик'};
 const ST={ok:['Подтверждена','st-ok'],review:['На рассмотрении','st-review'],draft:['Черновик','st-draft']};
 let seq=13, cur=null;
 let claims=[
@@ -417,7 +423,7 @@ function short(s){return s.split(',')[0].replace('Санкт-Петербург'
 
 /* ---------- главная ---------- */
 function claimRow(c){const [t,cl]=ST[c.status];return `<button class="claim" style="border:0;border-bottom:1px solid var(--line2);background:none;flex-direction:row;align-items:center;padding:14px 16px" onclick="openClaim('${c.id}')"><div style="flex:1"><div class="b" style="font-size:14px">${c.route}</div><div class="small mut" style="margin-top:2px">${c.cargo} · ${rub(c.cost)}</div></div><span class="chip ${cl}">${t}</span></button>`}
-const HOOK={};
+HOOK={};
 HOOK.home=()=>{ $('#homeList').innerHTML=claims.filter(c=>c.status!=='draft').slice(0,3).map(claimRow).join(''); $('#attnSec').style.display=claims.some(c=>c.status==='draft')?'':'none'; };
 function resetForm(){
   $('#fName').value='Бытовая техника (холодильники, 24 шт.)';$('#fCost').value='2 450 000';$('#f110').checked=true;$('#fTtn').value='ТН-004512';
@@ -425,8 +431,8 @@ function resetForm(){
   const d=new Date(); d.setDate(d.getDate()+1); $('#fD1').value=iso(d); d.setDate(d.getDate()+2); $('#fD2').value=iso(d);
   form.veh=VEH[0];form.drv=DRV[0];form.emails=['a.smirnov@translog.ru','docs@translog.ru'];$('#fRisk2').checked=false;
 }
-function startNew(){cur=null;resetForm();go('contract')}
-function repeatLast(){cur=null;resetForm();const c=claims.find(c=>c.status!=='draft');if(c){$('#fName').value=c.cargo;$('#fCost').value=c.cost.toLocaleString('ru-RU');$('#fSnd').value=c.snd||'';$('#fRcv').value=c.rcv||'';form.veh=c.veh;form.drv=c.drv}toast('Данные прошлой анкеты подставлены. Проверьте даты.');go('cargo')}
+function startNew(){resetForm();go('contract')}
+function repeatLast(){resetForm();const c=claims.find(c=>c.status!=='draft');if(c){$('#fName').value=c.cargo;$('#fCost').value=c.cost.toLocaleString('ru-RU');$('#fSnd').value=c.snd||'';$('#fRcv').value=c.rcv||'';form.veh=c.veh;form.drv=c.drv}toast('Данные прошлой анкеты подставлены. Проверьте даты.');go('cargo')}
 function openDraft(){resetForm();$('#fName').value='Электроинструмент';$('#fCost').value='1 300 000';$('#fTtn').value='ТН-004530';form.veh=null;form.drv=null;cur={draftId:'d1'};go('transport')}
 
 /* ---------- шаги ---------- */
@@ -469,9 +475,10 @@ HOOK.review=()=>{
     +row('Маршрут',`${route}, ${ru($('#fD1').value)} – ${ru($('#fD2').value)}`,`${$('#fSnd').value} → ${$('#fRcv').value}`,'route')
     +row('Транспорт',v||d?[v&&v.num,d&&d.fio.split(' ').map((x,i)=>i?x[0]+'.':x).join(' ')].filter(Boolean).join(' · '):'Не указан','', 'transport');
   $('#sumCard').lastElementChild.style.borderBottom='0';
-  $('#emails').innerHTML=form.emails.map(e=>`<span>${e}</span>`).join('')+(form.emails.includes('info@alfa-electro.ru')?'':'<button onclick="addSenderEmail()">+ Отправителю</button>');
+  $('#emails').innerHTML=form.emails.map(e=>`<span>${e}</span>`).join('')+(senderEmail()&&form.emails.includes(senderEmail())?'':'<button onclick="addSenderEmail()">+ Отправителю</button>');
 };
-function addSenderEmail(){form.emails.push('info@alfa-electro.ru');HOOK.review();toast('Полис уйдёт и грузоотправителю')}
+function senderEmail(){const c=CP.find(x=>x.n===$('#fSnd').value.trim());return c&&c.email}
+function addSenderEmail(){const e=senderEmail();if(!e)return toast('У грузоотправителя нет email. Добавьте его в справочнике «Контрагенты».');form.emails.push(e);HOOK.review();toast('Полис уйдёт и грузоотправителю')}
 async function submitClaim(){
   await busy('Отправляем анкету','Создаём анкету в «Совкомбанк страхование»',1300);
   const p=$('#f110').checked,c=cost();
@@ -507,9 +514,8 @@ HOOK.card=()=>{
   $('#cBody').innerHTML=pol+`<div class="card pad sec"><div class="b">Страхование</div><div class="kv"><span>Риск</span><span>Все риски${c.risk2?' + предпринимательский':''}</span></div><div class="kv"><span>Страховая сумма</span><span>${rub(sum)}</span></div><div class="kv"><span>Тариф · франшиза</span><span>0,12 % · 0 %</span></div><div class="kv"><span>Премия</span><span style="font-weight:700">${rub(sum*0.0012)}</span></div></div>`
    +`<div class="card pad sec" style="font-size:14px"><div class="b">Перевозка</div><div><span class="mut">Груз:</span> ${c.cargo}, ${rub(c.cost)}, ${c.ttn}</div><div><span class="mut">Отправитель:</span> ${c.snd}</div><div><span class="mut">Получатель:</span> ${c.rcv}</div><div><span class="mut">Даты:</span> ${c.d1} – ${c.d2}</div><div><span class="mut">Транспорт:</span> ${[c.veh&&c.veh.num,c.drv&&c.drv.fio].filter(Boolean).join(', ')||'не указан'}</div></div>`
    +`<div class="card pad sec"><div class="b">История</div>${hist.map(([a,b])=>`<div style="display:flex;gap:10px;font-size:13px"><span class="mut" style="width:44px;flex-shrink:0">${a}</span><span>${b}</span></div>`).join('')}</div>`
-   +`<button class="btn2" style="flex:none;height:48px" onclick="contactInsurer()">Связаться со страховой</button>`;
+   +`<button class="btn2" style="flex:none;height:48px" onclick="openSheet('Связаться со страховой','<p class=&quot;mut&quot; style=&quot;margin:0 0 12px&quot;>Изменить или отменить анкету через API нельзя. Подготовим письмо в страховую с номером анкеты.</p><button class=&quot;btn&quot; style=&quot;width:100%&quot; onclick=&quot;closeSheet();toast(\\'В демо письмо не отправляется\\')&quot;>Написать в страховую</button>')">Связаться со страховой</button>`;
 };
-function contactInsurer(){openSheet('Связаться со страховой','<p class="mut" style="margin:0 0 12px">Изменить или отменить анкету через API нельзя. Подготовим письмо в страховую с номером анкеты.</p><button class="btn" style="width:100%" onclick="closeSheet();toast(\'В демо письмо не отправляется\')">Написать в страховую</button>')}
 function openPolicy(){openSheet('Полис',`<div class="note n-gray" style="margin-bottom:8px">${ICON.lock}<span>В демо-версии полис не формируется. В рабочей версии здесь откроется PDF, полученный из страховой компании.</span></div>`)}
 async function sharePolicy(){const t=`Полис ${cur.no}: ${cur.route}, ${cur.cargo}`;if(navigator.share){try{await navigator.share({title:'Полис страхования груза',text:t})}catch(e){}}else toast('Поделиться: '+t)}
 
@@ -521,13 +527,32 @@ function renderCat(){
   if(cat==='drv') h=`<div class="card list">${DRV.map(d=>`<div><div class="av" ${d.ok?'':'style="background:var(--warn-t);color:var(--warn)"'}>${d.ini}</div><div style="flex:1"><div class="b">${d.fio}</div><div class="small" style="color:${d.ok?'var(--ok)':'var(--warn)'}">${d.ok?'Данные заполнены':'Не хватает: '+d.miss}</div></div>${d.ok?'':'<button class="btnl" onclick="fixDrv('+d.id+')">Дополнить</button>'}</div>`).join('')}</div>
     <div class="note n-gray">${ICON.lock}<span>Паспортные данные хранятся в зашифрованном виде и передаются только в страховую в составе анкеты. Водитель без полных данных в анкету не попадёт.</span></div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="toast('В демо добавление не сохраняется')">${ICON.plus}Добавить водителя</button>`;
   if(cat==='veh') h=`<div class="card list">${VEH.map(v=>`<div><div class="ico">${ICON.truck}</div><div style="flex:1"><div class="b">${v.num} · ${v.brand}</div><div class="small mut">${v.trl?'Прицеп '+v.trl:'Без прицепа'}</div></div></div>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="toast('В демо добавление не сохраняется')">${ICON.plus}Добавить машину</button>`;
-  if(cat==='cp') h=`<div class="card list">${CP.map(c=>`<div><div class="ico">${ICON.bld}</div><div style="flex:1"><div class="b">${c.n}</div><div class="small mut">${c.r}</div></div></div>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="toast('В демо добавление не сохраняется')">${ICON.plus}Добавить контрагента</button>`;
+  if(cat==='cp') h=`<div class="card list">${CP.map(c=>`<div><div class="ico">${ICON.bld}</div><div style="flex:1;min-width:0"><div class="b">${c.n}</div><div class="small mut">${c.roles.map(r=>ROLE[r]).join(', ')}${c.addr?' · '+c.addr.split(',')[0]:''}</div><div class="small mut">${c.inn?'ИНН '+c.inn:'ИНН не указан'}${c.email?' · '+c.email:''}</div></div></div>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="addCp()">${ICON.plus}Добавить контрагента</button>`;
   $('#catBody').innerHTML=h;
 }
+function fillCpList(){$('#cpList').innerHTML=CP.map(c=>`<option value="${c.n}">${c.roles.map(r=>ROLE[r]).join(', ')}</option>`).join('')}
+function cpPicked(f,addrField){const c=CP.find(x=>x.n===$('#'+f).value.trim());if(c&&c.addr){$('#'+addrField).value=c.addr;toast('Адрес подставлен из справочника')}}
+function addCp(){openSheet('Новый контрагент',`<div style="display:flex;flex-direction:column;gap:14px;padding-top:6px">
+<div><label class="lbl" for="cInn">ИНН</label><div style="display:flex;gap:8px"><input class="in" id="cInn" inputmode="numeric" maxlength="12" placeholder="10 или 12 цифр"><button class="btn2" style="flex:none;padding:0 16px;height:48px" onclick="fillByInn()">Найти</button></div><div class="hint">Заполним название, КПП и адрес по ЕГРЮЛ</div></div>
+<div><label class="lbl" for="cName">Наименование *</label><input class="in" id="cName" placeholder="ООО «Название»"><div class="hint">Это значение уходит в страховую в поле грузоотправителя, получателя или перевозчика</div></div>
+<div><label class="lbl" for="cKpp">КПП</label><input class="in" id="cKpp" inputmode="numeric" maxlength="9"></div>
+<fieldset style="border:0;margin:0;padding:0"><legend class="lbl">Роль в перевозках *</legend><div class="card"><label class="switch"><span>Грузоотправитель</span><input type="checkbox" class="cRole" value="snd" checked></label><label class="switch"><span>Грузополучатель</span><input type="checkbox" class="cRole" value="rcv"></label><label class="switch"><span>Перевозчик / экспедитор</span><input type="checkbox" class="cRole" value="fwd"></label></div></fieldset>
+<div><label class="lbl" for="cAddr">Адрес погрузки / разгрузки</label><input class="in" id="cAddr"><div class="hint">Подставится в пункт отправления или назначения</div></div>
+<div><label class="lbl" for="cMail">Email для копии полиса</label><input class="in" id="cMail" type="email" placeholder="необязательно"></div>
+<div><label class="lbl" for="cPhone">Телефон контакта</label><input class="in" id="cPhone" type="tel" placeholder="необязательно"></div>
+<button class="btn" style="flex:none" onclick="saveCp()">Сохранить</button></div>`)}
+function fillByInn(){const v=$('#cInn').value.replace(/\D/g,'');if(!/^(\d{10}|\d{12})$/.test(v))return toast('ИНН — 10 цифр для организации или 12 для ИП');
+  $('#cName').value=v.length===12?'ИП Соколов Игорь Петрович':'ООО «Северный Терминал»';$('#cKpp').value=v.length===12?'':'780101001';$('#cAddr').value='Санкт-Петербург, Портовая ул., 15';toast('Данные найдены (в демо — пример)')}
+function saveCp(){const n=$('#cName').value.trim(),inn=$('#cInn').value.replace(/\D/g,''),mail=$('#cMail').value.trim(),roles=$$('.cRole').filter(x=>x.checked).map(x=>x.value);
+  if(!n)return toast('Укажите наименование');if(n.length>1000)return toast('Наименование — не более 1000 символов');
+  if(inn&&!/^(\d{10}|\d{12})$/.test(inn))return toast('ИНН — 10 или 12 цифр');if(!roles.length)return toast('Отметьте хотя бы одну роль');
+  if(mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail))return toast('Проверьте email');if(mail.length>50)return toast('Email — не более 50 символов');
+  if(CP.some(c=>inn&&c.inn===inn))return toast('Контрагент с таким ИНН уже есть');
+  CP.push({n,inn,kpp:$('#cKpp').value.trim(),roles,addr:$('#cAddr').value.trim(),email:mail,phone:$('#cPhone').value.trim()});fillCpList();closeSheet();renderCat();toast('Контрагент добавлен')}
 function fixDrv(id){const d=DRV[id-1];d.ok=true;renderCat();toast('Данные водителя дополнены')}
 HOOK.catalogs=renderCat;
 
-resetForm(); show();
+fillCpList(); resetForm(); show();
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
