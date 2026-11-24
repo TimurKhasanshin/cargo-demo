@@ -60,6 +60,8 @@ h1,h2{margin:0}
 .lbl{display:block;font-size:13px;font-weight:500;color:var(--ink2);margin-bottom:6px}
 .in{width:100%;height:48px;border:1px solid var(--fld);border-radius:10px;padding:0 14px;font-size:16px;background:#fff}
 .in:focus{outline:2px solid var(--p);outline-offset:-1px;border-color:var(--p)}
+.in.bad{border-color:var(--err);outline:2px solid var(--err);outline-offset:-1px}
+.opt.bad{border:2px solid var(--err)}
 .in:disabled{background:var(--line2);color:var(--mut)}
 .hint{font-size:12px;color:var(--mut);margin-top:6px;line-height:1.4}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -359,6 +361,51 @@ input[type=radio],input[type=checkbox]{accent-color:var(--p);width:22px;height:2
   </main>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
+
+<!-- 13. ВОДИТЕЛЬ -->
+<section class="screen" id="drvForm">
+  <header class="top"><div class="row1"><button class="back" data-go="catalogs" aria-label="Назад"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div><div class="step" id="drvStep">Справочник</div><div class="title" id="drvTitle">Новый водитель</div></div></div></header>
+  <main>
+    <div class="note n-gray"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Все поля со звёздочкой обязательны: если хоть одно пустое, страховая не примет водителя. Паспортные данные хранятся зашифрованно.</span></div>
+    <button class="btn2" style="flex:none;height:48px" onclick="toast('В рабочей версии — распознавание фото разворота паспорта')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg>Заполнить по фото паспорта</button>
+    <div class="sec"><div class="h2">ФИО</div>
+      <div><label class="lbl" for="dFam">Фамилия *</label><input class="in" id="dFam" maxlength="50" autocomplete="off"></div>
+      <div><label class="lbl" for="dNam">Имя *</label><input class="in" id="dNam" maxlength="50" autocomplete="off"></div>
+      <div><label class="lbl" for="dPat">Отчество *</label><input class="in" id="dPat" maxlength="50" autocomplete="off"></div>
+    </div>
+    <div class="sec"><div class="h2">Паспорт</div>
+      <div class="grid2">
+        <div><label class="lbl" for="dSer">Серия *</label><input class="in" id="dSer" maxlength="4" inputmode="numeric"></div>
+        <div><label class="lbl" for="dNum">Номер *</label><input class="in" id="dNum" maxlength="10" inputmode="numeric"></div>
+      </div>
+      <div class="hint" style="margin-top:-4px">Для паспорта РФ: 4 и 6 цифр</div>
+      <div class="grid2">
+        <div><label class="lbl" for="dGd">Дата выдачи *</label><input class="in" id="dGd" type="date"></div>
+        <div><label class="lbl" for="dBd">Дата рождения *</label><input class="in" id="dBd" type="date"></div>
+      </div>
+      <div><label class="lbl" for="dWho">Кем выдан *</label><input class="in" id="dWho" maxlength="255"><div class="hint">Как в паспорте, до 255 символов</div></div>
+    </div>
+    <div><label class="lbl" for="dPhone">Телефон водителя</label><input class="in" id="dPhone" type="tel" placeholder="необязательно"><div class="hint">Пригласим водителя в приложение по SMS</div></div>
+    <label class="card opt" id="dConsentBox"><input type="checkbox" id="dConsent"><div class="s13">Водитель дал согласие на обработку персональных данных и их передачу в страховую компанию (152-ФЗ) *</div></label>
+  </main>
+  <div class="foot"><button class="btn" onclick="saveDrv()">Сохранить</button></div>
+</section>
+
+<!-- 14. МАШИНА -->
+<section class="screen" id="vehForm">
+  <header class="top"><div class="row1"><button class="back" data-go="catalogs" aria-label="Назад"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div><div class="step" id="vehStep">Справочник</div><div class="title" id="vehTitle">Новая машина</div></div></div></header>
+  <main>
+    <div class="sec"><div class="h2">Тягач</div>
+      <div><label class="lbl" for="vNum">Госномер *</label><input class="in" id="vNum" maxlength="12" placeholder="А123ВС777" autocapitalize="characters" autocomplete="off" oninput="vHint()"><div class="hint" id="vNumHint">Без пробелов, до 9 символов — ограничение страховой</div></div>
+      <div><label class="lbl" for="vBrand">Марка и модель *</label><input class="in" id="vBrand" maxlength="20" placeholder="Volvo FH"><div class="hint">До 20 символов</div></div>
+    </div>
+    <div class="sec"><div class="h2">Прицеп</div>
+      <div><label class="lbl" for="vTrl">Госномер прицепа</label><input class="in" id="vTrl" maxlength="12" placeholder="ВТ456777" autocapitalize="characters" autocomplete="off"><div class="hint">Необязательно, до 9 символов</div></div>
+    </div>
+    <div class="note n-info"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>Латинские буквы в номере (A, B, E, K, M, H, O, P, C, T, Y, X) заменим на русские автоматически.</span></div>
+  </main>
+  <div class="foot"><button class="btn" onclick="saveVeh()">Сохранить</button></div>
+</section>
 </div>
 
 <div class="overlay" id="ov"><div class="loader"><div class="spin" aria-hidden="true"></div><div class="b" id="ovText"></div><div class="small mut" id="ovSub"></div></div></div>
@@ -381,8 +428,17 @@ const TABS=[['home','Главная','<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v
 $$('.tabs').forEach(n=>{n.setAttribute('aria-label','Основное меню');n.innerHTML=TABS.map(([id,t,p])=>`<button data-go="${id}" class="${n.dataset.tab===id?'on':''}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>${t}</button>`).join('')});
 
 /* ---------- данные ---------- */
-const VEH=[{id:1,num:'А123ВС 777',brand:'Volvo FH',trl:'ВТ4567 77'},{id:2,num:'М456ОР 199',brand:'КАМАЗ 54901',trl:'АК1203 50'},{id:3,num:'Е789КХ 750',brand:'Scania R450',trl:''}];
-const DRV=[{id:1,fio:'Петров Сергей Иванович',ini:'ПС',ok:true},{id:2,fio:'Козлов Андрей Викторович',ini:'КА',ok:true},{id:3,fio:'Никитин Дмитрий Олегович',ini:'НД',ok:false,miss:'кем выдан паспорт'}];
+const LAT={A:'А',B:'В',E:'Е',K:'К',M:'М',H:'Н',O:'О',P:'Р',C:'С',T:'Т',Y:'У',X:'Х'};
+const plate=s=>(s||'').toUpperCase().replace(/[\s-]/g,'').replace(/[ABEKMHOPCTYX]/g,c=>LAT[c]);
+const fmtPlate=s=>s.replace(/^([А-Я]\d{3}[А-Я]{2})(\d{2,3})$/,'$1 $2').replace(/^([А-Я]{2}\d{4})(\d{2,3})$/,'$1 $2');
+function normVeh(v){v.num=fmtPlate(v.gos);v.trl=v.trlGos?fmtPlate(v.trlGos):'';return v}
+function normDrv(d){d.fio=[d.fam,d.nam,d.pat].filter(Boolean).join(' ');d.ini=(d.fam||' ')[0]+(d.nam||' ')[0];
+  const need=[['fam','фамилия'],['nam','имя'],['pat','отчество'],['ser','серия паспорта'],['num','номер паспорта'],['gd','дата выдачи'],['bd','дата рождения'],['who','кем выдан паспорт']];
+  const miss=need.filter(([k])=>!d[k]).map(x=>x[1]);d.ok=!miss.length;d.miss=miss.join(', ');return d}
+const VEH=[{id:1,gos:'А123ВС777',brand:'Volvo FH',trlGos:'ВТ456777'},{id:2,gos:'М456ОР199',brand:'КАМАЗ 54901',trlGos:'АК120350'},{id:3,gos:'Е789КХ750',brand:'Scania R450',trlGos:''}].map(normVeh);
+const DRV=[{id:1,fam:'Петров',nam:'Сергей',pat:'Иванович',ser:'4507',num:'123488',gd:'2012-05-14',bd:'1985-03-02',who:'ОУФМС России по г. Москве',phone:'+7 916 111-22-33'},
+  {id:2,fam:'Козлов',nam:'Андрей',pat:'Викторович',ser:'4611',num:'556201',gd:'2015-09-30',bd:'1990-07-21',who:'ТП УФМС России по Московской обл.',phone:''},
+  {id:3,fam:'Никитин',nam:'Дмитрий',pat:'Олегович',ser:'4009',num:'771045',gd:'2010-02-11',bd:'1982-11-05',who:'',phone:''}].map(normDrv);
 const CP=[
   {n:'ООО «Альфа Электро»',inn:'7701234567',kpp:'770101001',roles:['snd'],addr:'Москва, ул. Складская, 12',email:'info@alfa-electro.ru'},
   {n:'ООО «ТехноМаркет Казань»',inn:'1655123456',kpp:'165501001',roles:['rcv'],addr:'Казань, пр. Победы, 141',email:''},
@@ -457,9 +513,9 @@ function renderTransport(){
     :`<button class="add" style="width:100%" onclick="pickDrv()">${ICON.plus}Выбрать водителя</button>`;
 }
 HOOK.transport=renderTransport;
-function pickVeh(){openSheet('Машина',VEH.map(v=>`<button class="pick" onclick="form.veh=VEH[${v.id-1}];closeSheet();renderTransport()"><div class="ico">${ICON.truck}</div><div><div class="b">${v.num} · ${v.brand}</div><div class="s13 mut">${v.trl?'Прицеп '+v.trl:'Без прицепа'}</div></div></button>`).join('')+`<button class="pick" onclick="form.veh=null;closeSheet();renderTransport()"><div class="mut">Без машины</div></button>`)}
-function pickDrv(){openSheet('Водитель',DRV.map(d=>d.ok?`<button class="pick" onclick="form.drv=DRV[${d.id-1}];closeSheet();renderTransport()"><div class="av">${d.ini}</div><div><div class="b">${d.fio}</div><div class="s13" style="color:var(--ok)">Данные заполнены</div></div></button>`
-  :`<button class="pick" onclick="toast('Нельзя выбрать: не хватает данных (${d.miss}). Страховая отбросит неполного водителя.')"><div class="av" style="background:var(--warn-t);color:var(--warn)">${d.ini}</div><div><div class="b mut">${d.fio}</div><div class="s13" style="color:var(--warn)">Не хватает: ${d.miss}</div></div></button>`).join('')+`<button class="pick" onclick="form.drv=null;closeSheet();renderTransport()"><div class="mut">Без водителя</div></button>`)}
+function pickVeh(){openSheet('Машина',VEH.map(v=>`<button class="pick" onclick="form.veh=VEH.find(x=>x.id===${v.id});closeSheet();renderTransport()"><div class="ico">${ICON.truck}</div><div><div class="b">${v.num} · ${v.brand}</div><div class="s13 mut">${v.trl?'Прицеп '+v.trl:'Без прицепа'}</div></div></button>`).join('')+`<button class="pick" onclick="closeSheet();openVehForm(null,'transport')" style="color:var(--b)">${ICON.plus}<span class="b">Новая машина</span></button><button class="pick" onclick="form.veh=null;closeSheet();renderTransport()"><div class="mut">Без машины</div></button>`)}
+function pickDrv(){openSheet('Водитель',DRV.map(d=>d.ok?`<button class="pick" onclick="form.drv=DRV.find(x=>x.id===${d.id});closeSheet();renderTransport()"><div class="av">${d.ini}</div><div><div class="b">${d.fio}</div><div class="s13" style="color:var(--ok)">Данные заполнены</div></div></button>`
+:`<button class="pick" onclick="closeSheet();toast('Не хватает: ${d.miss}. Дополните данные — без них страховая не примет водителя.');openDrvForm(${d.id},'transport')"><div class="av" style="background:var(--warn-t);color:var(--warn)">${d.ini}</div><div><div class="b mut">${d.fio}</div><div class="s13" style="color:var(--warn)">Не хватает: ${d.miss}</div></div></button>`).join('')+`<button class="pick" onclick="closeSheet();openDrvForm(null,'transport')" style="color:var(--b)">${ICON.plus}<span class="b">Новый водитель</span></button><button class="pick" onclick="form.drv=null;closeSheet();renderTransport()"><div class="mut">Без водителя</div></button>`)}
 function skipTransport(){form.veh=null;form.drv=null;go('review')}
 function saveDraft(){const id=cur&&cur.draftId;const c={id:id||'d'+Date.now(),no:null,route:short($('#fFrom').value)+' → '+short($('#fTo').value),cargo:$('#fName').value,ttn:$('#fTtn').value,cost:cost(),status:'draft',day:'Сегодня',sub:'Ждёт машину и водителя'};
   claims=claims.filter(x=>x.id!==c.id);claims.unshift(c);cur=null;toast('Черновик сохранён');go('home')}
@@ -524,9 +580,9 @@ let cat='drv';
 $('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cat=b.dataset.c;$$('#seg button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',x===b)});renderCat()});
 function renderCat(){
   let h='';
-  if(cat==='drv') h=`<div class="card list">${DRV.map(d=>`<div><div class="av" ${d.ok?'':'style="background:var(--warn-t);color:var(--warn)"'}>${d.ini}</div><div style="flex:1"><div class="b">${d.fio}</div><div class="small" style="color:${d.ok?'var(--ok)':'var(--warn)'}">${d.ok?'Данные заполнены':'Не хватает: '+d.miss}</div></div>${d.ok?'':'<button class="btnl" onclick="fixDrv('+d.id+')">Дополнить</button>'}</div>`).join('')}</div>
-    <div class="note n-gray">${ICON.lock}<span>Паспортные данные хранятся в зашифрованном виде и передаются только в страховую в составе анкеты. Водитель без полных данных в анкету не попадёт.</span></div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="toast('В демо добавление не сохраняется')">${ICON.plus}Добавить водителя</button>`;
-  if(cat==='veh') h=`<div class="card list">${VEH.map(v=>`<div><div class="ico">${ICON.truck}</div><div style="flex:1"><div class="b">${v.num} · ${v.brand}</div><div class="small mut">${v.trl?'Прицеп '+v.trl:'Без прицепа'}</div></div></div>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="toast('В демо добавление не сохраняется')">${ICON.plus}Добавить машину</button>`;
+  if(cat==='drv') h=`<div class="card list">${DRV.map(d=>`<button style="border:0;background:none;width:100%;text-align:left;cursor:pointer" onclick="openDrvForm(${d.id})"><div class="av" ${d.ok?'':'style="background:var(--warn-t);color:var(--warn)"'}>${d.ini}</div><div style="flex:1;min-width:0"><div class="b">${d.fio}</div><div class="small mut">Паспорт ${d.ser||'••••'} ••••${(d.num||'').slice(-2)}</div><div class="small" style="color:${d.ok?'var(--ok)':'var(--warn)'}">${d.ok?'Данные заполнены':'Не хватает: '+d.miss}</div></div>${d.ok?'':'<span class="btnl" style="height:auto">Дополнить</span>'}</button>`).join('')}</div>
+    <div class="note n-gray">${ICON.lock}<span>Паспортные данные хранятся в зашифрованном виде и передаются только в страховую в составе анкеты. Водитель без полных данных в анкету не попадёт.</span></div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="openDrvForm()">${ICON.plus}Добавить водителя</button>`;
+  if(cat==='veh') h=`<div class="card list">${VEH.map(v=>`<button style="border:0;background:none;width:100%;text-align:left;cursor:pointer" onclick="openVehForm(${v.id})"><div class="ico">${ICON.truck}</div><div style="flex:1"><div class="b">${v.num} · ${v.brand}</div><div class="small mut">${v.trl?'Прицеп '+v.trl:'Без прицепа'}</div></div></button>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="openVehForm()">${ICON.plus}Добавить машину</button>`;
   if(cat==='cp') h=`<div class="card list">${CP.map(c=>`<div><div class="ico">${ICON.bld}</div><div style="flex:1;min-width:0"><div class="b">${c.n}</div><div class="small mut">${c.roles.map(r=>ROLE[r]).join(', ')}${c.addr?' · '+c.addr.split(',')[0]:''}</div><div class="small mut">${c.inn?'ИНН '+c.inn:'ИНН не указан'}${c.email?' · '+c.email:''}</div></div></div>`).join('')}</div><button class="btn" style="flex:none;height:48px;font-size:15px" onclick="addCp()">${ICON.plus}Добавить контрагента</button>`;
   $('#catBody').innerHTML=h;
 }
@@ -549,8 +605,40 @@ function saveCp(){const n=$('#cName').value.trim(),inn=$('#cInn').value.replace(
   if(mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail))return toast('Проверьте email');if(mail.length>50)return toast('Email — не более 50 символов');
   if(CP.some(c=>inn&&c.inn===inn))return toast('Контрагент с таким ИНН уже есть');
   CP.push({n,inn,kpp:$('#cKpp').value.trim(),roles,addr:$('#cAddr').value.trim(),email:mail,phone:$('#cPhone').value.trim()});fillCpList();closeSheet();renderCat();toast('Контрагент добавлен')}
-function fixDrv(id){const d=DRV[id-1];d.ok=true;renderCat();toast('Данные водителя дополнены')}
-HOOK.catalogs=renderCat;
+let ret='catalogs',editD=null,editV=null;
+const DF={dFam:'fam',dNam:'nam',dPat:'pat',dSer:'ser',dNum:'num',dGd:'gd',dBd:'bd',dWho:'who',dPhone:'phone'};
+function setBack(scr,to){$('#'+scr+' .back').dataset.go=to;$('#'+scr.replace('Form','Step')).textContent=to==='transport'?'Анкета · шаг 4':'Справочник'}
+function openDrvForm(id,from){ret=from||'catalogs';editD=id?DRV.find(d=>d.id===id):null;const d=editD||{};
+  for(const [f,k] of Object.entries(DF)){$('#'+f).value=d[k]||'';$('#'+f).classList.remove('bad')}
+  $('#dConsent').checked=!!editD;$('#dConsentBox').classList.remove('bad');$('#drvTitle').textContent=editD?'Водитель':'Новый водитель';setBack('drvForm',ret);go('drvForm');
+  if(editD&&!editD.ok){const f=Object.entries(DF).find(([f,k])=>!d[k]&&k!=='phone');if(f)setTimeout(()=>{$('#'+f[0]).classList.add('bad');$('#'+f[0]).focus()},150)}}
+function yearsBetween(a,b){const x=new Date(a),y=new Date(b);let n=y.getFullYear()-x.getFullYear();if(y<new Date(y.getFullYear(),x.getMonth(),x.getDate()))n--;return n}
+function saveDrv(){
+  $$('#drvForm .in').forEach(i=>i.classList.remove('bad'));$('#dConsentBox').classList.remove('bad');
+  const v={};for(const [f,k] of Object.entries(DF))v[k]=$('#'+f).value.trim();
+  const fail=(f,m)=>{const el=$('#'+f);el.classList.add('bad');el.focus();toast(m);return false};
+  const labels={dFam:'фамилию',dNam:'имя',dPat:'отчество',dSer:'серию паспорта',dNum:'номер паспорта',dGd:'дату выдачи',dBd:'дату рождения',dWho:'кем выдан паспорт'};
+  for(const f in labels) if(!v[DF[f]]) return fail(f,'Укажите '+labels[f]);
+  const today=iso(new Date());
+  if(v.bd>today||yearsBetween(v.bd,today)<18) return fail('dBd','Водителю должно быть не меньше 18 лет');
+  if(v.gd>today) return fail('dGd','Дата выдачи не может быть в будущем');
+  if(yearsBetween(v.bd,v.gd)<14) return fail('dGd','Паспорт выдаётся не раньше 14 лет');
+  if(!$('#dConsent').checked){$('#dConsentBox').classList.add('bad');return toast('Нужно согласие водителя на обработку персональных данных')}
+  let d;if(editD){d=Object.assign(editD,v)}else{d=Object.assign({id:Math.max(...DRV.map(x=>x.id))+1},v);DRV.push(d)}normDrv(d);
+  if(ret==='transport')form.drv=d;toast(editD?'Данные водителя сохранены':'Водитель добавлен');if(ret==='catalogs')cat='drv';go(ret)}
+function vHint(){const p=plate($('#vNum').value);const h=$('#vNumHint');h.textContent=p?('Уйдёт в страховую как '+p+' · '+p.length+' из 9 символов'):'Без пробелов, до 9 символов — ограничение страховой';h.style.color=p.length>9?'var(--err)':''}
+function openVehForm(id,from){ret=from||'catalogs';editV=id?VEH.find(v=>v.id===id):null;const v=editV||{};
+  $('#vNum').value=v.gos||'';$('#vBrand').value=v.brand||'';$('#vTrl').value=v.trlGos||'';$$('#vehForm .in').forEach(i=>i.classList.remove('bad'));
+  $('#vehTitle').textContent=editV?'Машина':'Новая машина';setBack('vehForm',ret);vHint();go('vehForm')}
+function saveVeh(){$$('#vehForm .in').forEach(i=>i.classList.remove('bad'));
+  const gos=plate($('#vNum').value),brand=$('#vBrand').value.trim(),trlGos=plate($('#vTrl').value);
+  const fail=(f,m)=>{$('#'+f).classList.add('bad');$('#'+f).focus();toast(m)};
+  if(!gos)return fail('vNum','Укажите госномер тягача');if(gos.length>9)return fail('vNum','Госномер — не более 9 символов без пробелов');
+  if(!brand)return fail('vBrand','Укажите марку');if(trlGos.length>9)return fail('vTrl','Номер прицепа — не более 9 символов');
+  if(VEH.some(v=>v.gos===gos&&v!==editV))return fail('vNum','Машина с таким номером уже есть');
+  let v;if(editV){v=Object.assign(editV,{gos,brand,trlGos})}else{v={id:Math.max(...VEH.map(x=>x.id))+1,gos,brand,trlGos};VEH.push(v)}normVeh(v);
+  if(ret==='transport')form.veh=v;toast(editV?'Машина сохранена':'Машина добавлена');if(ret==='catalogs')cat='veh';go(ret)}
+HOOK.catalogs=()=>{$$('#seg button').forEach(x=>{x.classList.toggle('on',x.dataset.c===cat);x.setAttribute('aria-selected',x.dataset.c===cat)});renderCat()};
 
 fillCpList(); resetForm(); show();
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js');
