@@ -1,4 +1,4 @@
-const CACHE='cargo-demo-v4';
+const CACHE='cargo-demo-v5';
 const FILES=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./icons/apple-touch-icon.png'];
 // Новая версия скачивается мимо HTTP-кэша и ждёт, пока пользователь нажмёт «Обновить»
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:'reload'})))))});

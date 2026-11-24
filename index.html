@@ -122,6 +122,8 @@ input[type=radio],input[type=checkbox]{accent-color:var(--p);width:22px;height:2
 .pick:disabled{cursor:not-allowed;opacity:1}
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--sab));transform:translateX(-50%);z-index:30;background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;max-width:340px;display:none;text-align:center}
 .toast.on{display:block}
+.info{width:44px;height:44px;margin:-10px -10px -10px 0;border:0;border-radius:22px;background:none;color:var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.info:active{background:var(--b-t)}
 .upd{position:fixed;left:50%;transform:translateX(-50%);top:calc(8px + var(--sat));width:calc(100% - 24px);max-width:456px;z-index:50;background:var(--ink);color:#fff;border-radius:14px;padding:10px 6px 10px 14px;display:none;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 .upd.on{display:flex}
 .upd #updBtn{height:40px;padding:0 14px;border:0;border-radius:10px;background:var(--p);color:#fff;font-weight:600;cursor:pointer;flex-shrink:0}
@@ -281,8 +283,8 @@ input[type=radio],input[type=checkbox]{accent-color:var(--p);width:22px;height:2
     <div class="card" style="padding:4px 16px" id="sumCard"></div>
     <div class="card pad sec">
       <div class="b">Риски</div>
-      <div style="display:flex;gap:12px;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><div style="font-size:14px">«С ответственностью за все риски»<div class="small mut">Обязательный, включён договором</div></div></div>
-      <label style="display:flex;gap:12px;align-items:center;cursor:pointer"><input type="checkbox" id="fRisk2"><div style="font-size:14px">Предпринимательский риск<div class="small mut">Дополнительно, по желанию</div></div></label>
+      <div style="display:flex;gap:12px;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><div style="font-size:14px;flex:1">«С ответственностью за все риски»<div class="small mut">Обязательный, включён договором</div></div><button class="info" aria-label="Что значит «С ответственностью за все риски»" onclick="riskInfo('all')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button></div>
+      <div style="display:flex;gap:12px;align-items:center"><label style="display:flex;gap:12px;align-items:center;cursor:pointer;flex:1"><input type="checkbox" id="fRisk2"><div style="font-size:14px">Предпринимательский риск<div class="small mut">Дополнительно, по желанию</div></div></label><button class="info" aria-label="Что значит «Предпринимательский риск»" onclick="riskInfo('biz')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button></div>
     </div>
     <div class="card pad sec">
       <div class="b">Полис на email</div>
@@ -583,6 +585,10 @@ HOOK.card=()=>{
    +`<div class="card pad sec"><div class="b">История</div>${hist.map(([a,b])=>`<div style="display:flex;gap:10px;font-size:13px"><span class="mut" style="width:44px;flex-shrink:0">${a}</span><span>${b}</span></div>`).join('')}</div>`
    +`<button class="btn2" style="flex:none;height:48px" onclick="openSheet('Связаться со страховой','<p class=&quot;mut&quot; style=&quot;margin:0 0 12px&quot;>Изменить или отменить анкету через API нельзя. Подготовим письмо в страховую с номером анкеты.</p><button class=&quot;btn&quot; style=&quot;width:100%&quot; onclick=&quot;closeSheet();toast(\\'В демо письмо не отправляется\\')&quot;>Написать в страховую</button>')">Связаться со страховой</button>`;
 };
+const RISK_INFO={
+  all:{t:'«С ответственностью за все риски»',tag:'Обязательный',d:'Самое широкое покрытие. Страховая возмещает гибель, пропажу или повреждение груза по любой причине: ДТП, пожар, кража, повреждение при погрузке и разгрузке.',ex:'Не покрываются: военные действия и забастовки, умысел страхователя или водителя, естественные свойства груза (усушка, порча), плохая упаковка, опоздание с доставкой.',note:'Включён в генеральный договор, отключить его нельзя.'},
+  biz:{t:'Предпринимательский риск',tag:'По желанию',d:'Покрывает не сам груз, а финансовые потери компании, связанные с перевозкой. Например, убытки из-за того, что контрагент не выполнил обязательства.',ex:'Что именно покрывается и в каких пределах, определяет генеральный договор.',note:'Увеличивает премию. Подключайте, если это предусмотрено договором с вашим клиентом.'}};
+function riskInfo(k){const r=RISK_INFO[k];openSheet(r.t,`<div style="display:flex;flex-direction:column;gap:12px;padding-top:4px"><span class="tag" style="align-self:flex-start">${r.tag}</span><p style="margin:0;font-size:15px;line-height:1.5">${r.d}</p><p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink2)">${r.ex}</p><div class="note n-info" style="font-size:13px">${r.note}</div><p class="small mut" style="margin:0">Точные условия и исключения — в генеральном договоре и Правилах страхования грузов страховой компании.</p><button class="btn" style="flex:none;margin-top:4px" onclick="closeSheet()">Понятно</button></div>`)}
 function openPolicy(){openSheet('Полис',`<div class="note n-gray" style="margin-bottom:8px">${ICON.lock}<span>В демо-версии полис не формируется. В рабочей версии здесь откроется PDF, полученный из страховой компании.</span></div>`)}
 async function sharePolicy(){const t=`Полис ${cur.no}: ${cur.route}, ${cur.cargo}`;if(navigator.share){try{await navigator.share({title:'Полис страхования груза',text:t})}catch(e){}}else toast('Поделиться: '+t)}
 
@@ -653,7 +659,7 @@ HOOK.catalogs=()=>{$$('#seg button').forEach(x=>{x.classList.toggle('on',x.datas
 
 fillCpList(); resetForm(); show();
 /* ---------- обновления ---------- */
-const APP_VERSION='4';
+const APP_VERSION='5';
 $('#appVer').textContent=APP_VERSION;
 let swReg=null,waitingSW=null;
 function showUpd(w){waitingSW=w;$('#updBtn').disabled=false;$('#updBtn').textContent='Обновить';$('#upd').classList.add('on')}
